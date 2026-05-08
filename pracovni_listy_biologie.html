@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Terénní kurz biologie | Jižní Morava</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+
+  :root {
+    --green-dark: #2d5016;
+    --green-mid: #4a7c2f;
+    --green-light: #8ab564;
+    --green-pale: #d4e8c2;
+    --green-bg: #f0f7e8;
+    --amber: #c87941;
+    --amber-light: #f5dfc0;
+    --stone: #6b6355;
+    --stone-light: #e8e3da;
+    --white: #fdfcf8;
+    --ink: #1a1a14;
+    --canvas-bg: #f8f6f0;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(45,80,22,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--canvas-bg);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* NAV */
+  .top-nav {
+    background: var(--green-dark);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+  }
+
+  .nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .nav-logo {
+    font-family: 'Lora', serif;
+    color: var(--green-pale);
+    font-size: 13px;
+    font-style: italic;
+    opacity: 0.9;
+  }
+
+  .nav-title {
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+
+  .nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .nav-tab {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
+
+  .nav-tab.active {
+    color: white;
+    border-bottom-color: var(--green-light);
+    background: rgba(255,255,255,0.07);
+  }
+
+  .nav-tab:hover { color: white; }
+
+  /* PAGES */
+  .page { display: none; padding: 20px 16px 60px; max-width: 900px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* SHEET HEADER */
+  .sheet-header {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+    border-radius: var(--radius);
+    padding: 24px 24px 20px;
+    margin-bottom: 24px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sheet-header::before {
+    content: '';
+    position: absolute;
+    right: -20px; top: -20px;
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+
+  .sheet-header::after {
+    content: '';
+    position: absolute;
+    right: 30px; top: 40px;
+    width: 70px; height: 70px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+
+  .sheet-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green-pale);
+    margin-bottom: 6px;
+    opacity: 0.9;
+  }
+
+  .sheet-title {
+    font-family: 'Lora', serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+
+  .sheet-subtitle {
+    font-size: 13px;
+    opacity: 0.7;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .sheet-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  @media (max-width: 500px) {
+    .sheet-meta { grid-template-columns: 1fr 1fr; }
+    .sheet-meta .meta-full { grid-column: 1 / -1; }
+  }
+
+  .meta-field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--green-pale);
+    margin-bottom: 4px;
+    opacity: 0.85;
+  }
+
+  .meta-field input {
+    width: 100%;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: white;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .meta-field input::placeholder { color: rgba(255,255,255,0.45); }
+  .meta-field input:focus {
+    border-color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.22);
+  }
+
+  /* SECTIONS */
+  .section {
+    background: white;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .section-header {
+    background: linear-gradient(90deg, var(--green-pale) 0%, rgba(212,232,194,0.3) 100%);
+    padding: 14px 18px;
+    border-bottom: 2px solid var(--green-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-num {
+    background: var(--green-mid);
+    color: white;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--green-dark);
+    line-height: 1.3;
+  }
+
+  .section-body { padding: 18px; }
+
+  /* SUBSECTION */
+  .subsection { margin-bottom: 24px; }
+  .subsection:last-child { margin-bottom: 0; }
+
+  .subsection-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .subsection-title .italic { font-style: italic; font-weight: 400; color: var(--stone); }
+
+  .subsection-desc {
+    font-size: 13px;
+    color: var(--stone);
+    margin-bottom: 12px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* INTRO BOX */
+  .intro-box {
+    background: var(--green-bg);
+    border-left: 4px solid var(--green-mid);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--green-dark);
+  }
+
+  /* TABLES */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 4px;
+    table-layout: fixed;
+  }
+
+  .data-table th {
+    background: var(--green-mid);
+    color: white;
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .data-table th:first-child { border-radius: 6px 0 0 0; }
+  .data-table th:last-child { border-radius: 0 6px 0 0; }
+
+  .data-table td {
+    padding: 0;
+    border: 1px solid var(--stone-light);
+    vertical-align: top;
+  }
+
+  .data-table tr:nth-child(even) td { background: var(--green-bg); }
+  .data-table tr:first-child td { background: white; }
+  .data-table tr:nth-child(even):first-child td { background: white; }
+
+  .cell-label {
+    padding: 8px 12px;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .cell-hint {
+    display: block;
+    font-weight: 400;
+    color: var(--stone);
+    font-style: italic;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  /* TABLE INPUTS */
+  .data-table td input[type="text"],
+  .data-table td textarea {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    resize: none;
+    min-height: 38px;
+    line-height: 1.5;
+    display: block;
+  }
+
+  .data-table td input[type="text"]:focus,
+  .data-table td textarea:focus {
+    background: rgba(74,124,47,0.06);
+    box-shadow: inset 0 0 0 2px var(--green-light);
+  }
+
+  /* DRAW + TYPE CELLS (split layout) */
+  .split-cell-row td { vertical-align: top; }
+
+  .draw-area-wrap {
+    padding: 10px 12px;
+  }
+  .draw-area-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--stone);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .draw-canvas-wrap {
+    position: relative;
+    background: var(--white);
+    border: 1.5px solid var(--stone-light);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  .draw-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    image-rendering: auto;
+  }
+
+  .canvas-tools {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .tool-btn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1.5px solid var(--stone-light);
+    background: white;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--stone);
+    transition: all 0.15s;
+    touch-action: manipulation;
+  }
+  .tool-btn:active { transform: scale(0.95); }
+  .tool-btn.active { background: var(--green-mid); color: white; border-color: var(--green-mid); }
+  .tool-btn.clear-btn { color: #c0392b; border-color: #e8c5c5; }
+  .tool-btn.clear-btn:active { background: #c0392b; color: white; }
+
+  .color-dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--stone-light);
+    cursor: pointer;
+    transition: transform 0.15s;
+    touch-action: manipulation;
+  }
+  .color-dot:active { transform: scale(1.2); }
+  .color-dot.active { border-color: var(--green-dark); box-shadow: 0 0 0 2px var(--green-light); }
+
+  .size-dot {
+    border-radius: 50%;
+    background: var(--ink);
+    cursor: pointer;
+    border: 2px solid transparent;
+    touch-action: manipulation;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* QUESTION BOXES */
+  .question-box {
+    margin-bottom: 16px;
+  }
+
+  .question-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 8px;
+    padding: 12px 14px;
+    background: var(--amber-light);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .answer-area {
+    width: 100%;
+    min-height: 90px;
+    border: 1.5px solid var(--stone-light);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    resize: vertical;
+    background: white;
+    outline: none;
+    line-height: 1.7;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .answer-area:focus {
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(74,124,47,0.12);
+  }
+  .answer-area::placeholder { color: #bbb; }
+
+  /* BONUS */
+  .bonus-box {
+    background: linear-gradient(135deg, var(--amber-light), #fdf3e8);
+    border: 1.5px solid var(--amber);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-top: 4px;
+  }
+  .bonus-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+  .bonus-question {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+
+  /* CHECKBOX CHOICES */
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: var(--green-bg);
+    border: 1.5px solid var(--stone-light);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+    touch-action: manipulation;
+  }
+  .checkbox-item:active { transform: scale(0.97); }
+  .checkbox-item.checked {
+    background: var(--green-mid);
+    color: white;
+    border-color: var(--green-mid);
+  }
+  .checkbox-item input { display: none; }
+
+  /* INLINE INPUT */
+  .inline-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .inline-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--stone);
+    white-space: nowrap;
+    min-width: 80px;
+  }
+  .inline-input {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    border-bottom: 2px solid var(--stone-light);
+    background: transparent;
+    padding: 4px 6px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .inline-input:focus { border-bottom-color: var(--green-mid); }
+
+  /* SAVE / PRINT */
+  .actions-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1.5px solid var(--stone-light);
+    padding: 10px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    z-index: 50;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+
+  .action-btn {
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    touch-action: manipulation;
+  }
+  .btn-primary {
+    background: var(--green-mid);
+    color: white;
+  }
+  .btn-secondary {
+    background: var(--stone-light);
+    color: var(--stone);
+  }
+  .action-btn:active { transform: scale(0.97); opacity: 0.9; }
+
+  /* PROGRESS */
+  .progress-bar {
+    height: 4px;
+    background: var(--stone-light);
+    border-radius: 2px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-light), var(--green-mid));
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* SAVE INDICATOR */
+  .save-toast {
+    position: fixed;
+    top: 80px; right: 16px;
+    background: var(--green-dark);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 200;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .save-toast.show { opacity: 1; }
+
+  /* OBSERVATION TABLE */
+  .obs-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .obs-table { min-width: 600px; }
+
+  /* COMPACT TABLE */
+  .compact-table th, .compact-table td { padding: 6px 8px; font-size: 12px; }
+
+  @media (max-width: 600px) {
+    .sheet-title { font-size: 22px; }
+    .section-title { font-size: 15px; }
+    .nav-tab { padding: 10px 14px; font-size: 12px; }
+  }
+
+  @media print {
+    .top-nav, .actions-bar { display: none; }
+    .page { display: block !important; }
+    .section { box-shadow: none; border: 1px solid #ccc; }
+    canvas { border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<div class="save-toast" id="saveToast">✓ Uloženo</div>
+
+<nav class="top-nav">
+  <div class="nav-header">
+    <span class="nav-logo">biobrejn.cz</span>
+    <span class="nav-title">Terénní kurz | Jižní Morava</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage(0, this)">🌿 Trichomy</button>
+    <button class="nav-tab" onclick="showPage(1, this)">🌱 Kořenové symbiózy</button>
+    <button class="nav-tab" onclick="showPage(2, this)">🌬️ Šíření diaspor</button>
+    <button class="nav-tab" onclick="showPage(3, this)">🌸 Opylení</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 1: TRICHOMY
+═══════════════════════════════════════════════════ -->
+<div class="page active" id="page-0">
+  <div class="sheet-header">
+    <div class="sheet-badge">Pracovní list 1</div>
+    <div class="sheet-title">Trichomy</div>
+    <div class="sheet-subtitle">Terénní kurz biologie · Jižní Morava · Pálava, Lednice-Valtice</div>
+    <div class="sheet-meta">
+      <div class="meta-field"><label>Jméno</label><input type="text" id="t1-jmeno" placeholder="Jméno a příjmení"></div>
+      <div class="meta-field"><label>Datum</label><input type="date" id="t1-datum"></div>
+      <div class="meta-field meta-full"><label>Lokalita</label><input type="text" id="t1-lokalita" placeholder="např. Pálava – Děvín"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="intro-box" style="margin:0;border-left:none;background:transparent;padding:0;color:var(--green-dark)">
+        <b>Trichomy</b> jsou jednobuněčné nebo mnohobuněčné výrůstky epidermis. Jsou nesmírně rozmanité v morfologii i funkci a představují jednu z nejdostupnějších adaptací viditelných pouhým okem nebo lupou. Pálava s teplomilnou xerofytní flórou je pro jejich studium ideální lokalitou.
+      </div>
+    </div>
+    <div class="section-body" style="padding:0">
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table compact-table">
+          <colgroup><col style="width:28%"><col style="width:26%"><col style="width:46%"></colgroup>
+          <tr><th>Typ trichomů</th><th>Morfologie</th><th>Příklady na lokalitě</th></tr>
+          <tr><td class="cell-label">Jednoduché</td><td>jednobuněčné nebo vícebuněčné</td><td><em>Galium aparine</em>, <em>Urtica</em></td></tr>
+          <tr><td class="cell-label">Hvězdicové</td><td>paprskovitě větvené, vícebuněčné</td><td><em>Verbascum</em>, <em>Alyssum</em></td></tr>
+          <tr><td class="cell-label">Šupinaté</td><td>štítovitá šupina na stopce</td><td><em>Elaeagnus</em>, <em>Atriplex</em></td></tr>
+          <tr><td class="cell-label">Žláznaté — hlavičkové</td><td>sekreční buňky na vrcholu stopky</td><td><em>Thymus</em>, <em>Salvia</em></td></tr>
+          <tr><td class="cell-label">Žláznaté — sedavé</td><td>sekreční buňky bez stopky</td><td><em>Thymus</em> (jiné typy)</td></tr>
+          <tr><td class="cell-label">Ostny</td><td>epidermální výrůstky s ostrým hrotem</td><td><em>Rosa</em> — pravé ostny</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Pozorování trichomů vybraných druhů</div>
+    </div>
+    <div class="section-body">
+      <p class="subsection-desc">Pro každý druh pozoruj list lupou (10× a 20×). Narýsuj schematický náčrt trichomů a vyplň popis. Jako podklad pod list použij tmavý papír pro lepší kontrast.</p>
+
+      <!-- 1.1 Verbascum -->
+      <div class="subsection">
+        <div class="subsection-title">1.1 <em class="italic">Verbascum</em> sp. (divizna) — hvězdicové trichomy</div>
+        <div class="subsection-desc">Stanoviště: ruderální místa, okraje cest, kamenité svahy. Trichomy na vrchní i spodní straně listu.</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:500px">
+            <colgroup><col style="width:45%"><col style="width:55%"></colgroup>
+            <tr><th colspan="2">Pozorování — <em>Verbascum</em> sp.</th></tr>
+            <tr class="split-cell-row">
+              <td>
+                <div class="draw-area-wrap">
+                  <div class="draw-area-label">
+                    <span>Náčrt trichomů (lupa 10× a 20×)</span>
+                  </div>
+                  <div class="draw-canvas-wrap" id="wrap-v1">
+                    <canvas id="canvas-v1" height="200"></canvas>
+                  </div>
+                  <div class="canvas-tools" id="tools-v1"></div>
+                </div>
+              </td>
+              <td>
+                <div style="padding:10px">
+                  <div class="inline-field"><label>Typ trichomů:</label><input class="inline-input" type="text" placeholder="hvězdicové / jednoduché / …"></div>
+                  <div class="inline-field"><label>Hustota:</label><input class="inline-input" type="text" placeholder="řídké / husté"></div>
+                  <div class="inline-field"><label>Umístění:</label><input class="inline-input" type="text" placeholder="ad/ab. strana, okraj"></div>
+                  <div class="inline-field"><label>Funkce:</label></div>
+                  <textarea class="answer-area" rows="3" placeholder="Pravděpodobná funkce trichomů…" style="margin-top:4px"></textarea>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Jak hvězdicový trichom vznikne ontogeneticky z jedné epidermální buňky? Co musí proběhnout?</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+
+      <!-- 1.2 Thymus -->
+      <div class="subsection">
+        <div class="subsection-title">1.2 <em class="italic">Thymus</em> sp. (mateřídouška) — žláznaté trichomy</div>
+        <div class="subsection-desc">Stanoviště: stepní trávníky Pálavy. Rozdrtit malý kousek listu mezi prsty — co cítíš?</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:500px">
+            <colgroup><col style="width:45%"><col style="width:55%"></colgroup>
+            <tr><th colspan="2">Pozorování — <em>Thymus</em> sp.</th></tr>
+            <tr class="split-cell-row">
+              <td>
+                <div class="draw-area-wrap">
+                  <div class="draw-area-label"><span>Náčrt trichomů (lupa 10× a 20×)</span></div>
+                  <div class="draw-canvas-wrap" id="wrap-t2"><canvas id="canvas-t2" height="200"></canvas></div>
+                  <div class="canvas-tools" id="tools-t2"></div>
+                </div>
+              </td>
+              <td>
+                <div style="padding:10px">
+                  <div class="inline-field"><label>Typ trichomů:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Hustota:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Umístění:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Funkce:</label></div>
+                  <textarea class="answer-area" rows="3" placeholder="Pravděpodobná funkce…" style="margin-top:4px"></textarea>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Jaké látky vylučují žláznaté trichomy mateřídoušky? Jaký mají ekologický a evoluční smysl?</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+
+      <!-- 1.3 Galium -->
+      <div class="subsection">
+        <div class="subsection-title">1.3 <em class="italic">Galium aparine</em> (svízel přítula) — háčkovité trichomy</div>
+        <div class="subsection-desc">Stanoviště: vlhké lemy lužního lesa, nitrofilní křoviny. Přilož list k oblečení — co se stane?</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:500px">
+            <colgroup><col style="width:45%"><col style="width:55%"></colgroup>
+            <tr><th colspan="2">Pozorování — <em>Galium aparine</em></th></tr>
+            <tr class="split-cell-row">
+              <td>
+                <div class="draw-area-wrap">
+                  <div class="draw-area-label"><span>Náčrt trichomů (lupa 10×)</span></div>
+                  <div class="draw-canvas-wrap" id="wrap-g3"><canvas id="canvas-g3" height="200"></canvas></div>
+                  <div class="canvas-tools" id="tools-g3"></div>
+                </div>
+              </td>
+              <td>
+                <div style="padding:10px">
+                  <div class="inline-field"><label>Typ trichomů:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Hustota:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Umístění:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Funkce:</label></div>
+                  <textarea class="answer-area" rows="3" placeholder="Pravděpodobná funkce…" style="margin-top:4px"></textarea>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Jakou funkci mají háčkovité trichomy svízele? Je to obrana před herbivory, nebo jiný účel?</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+
+      <!-- 1.4 Atriplex -->
+      <div class="subsection">
+        <div class="subsection-title">1.4 <em class="italic">Atriplex</em> / <em class="italic">Chenopodium</em> — měchýřkovité trichomy</div>
+        <div class="subsection-desc">Stanoviště: ruderální a solná stanoviště. List vypadá šedostříbřitě nebo jakoby poprášený.</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:500px">
+            <colgroup><col style="width:45%"><col style="width:55%"></colgroup>
+            <tr><th colspan="2">Pozorování — <em>Atriplex / Chenopodium</em></th></tr>
+            <tr class="split-cell-row">
+              <td>
+                <div class="draw-area-wrap">
+                  <div class="draw-area-label"><span>Náčrt trichomů (lupa 20×)</span></div>
+                  <div class="draw-canvas-wrap" id="wrap-a4"><canvas id="canvas-a4" height="200"></canvas></div>
+                  <div class="canvas-tools" id="tools-a4"></div>
+                </div>
+              </td>
+              <td>
+                <div style="padding:10px">
+                  <div class="inline-field"><label>Typ trichomů:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Hustota:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Umístění:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Funkce:</label></div>
+                  <textarea class="answer-area" rows="3" placeholder="Pravděpodobná funkce…" style="margin-top:4px"></textarea>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Měchýřkovité trichomy hromadí soli vytažené z pletiv. Jakou fyziologickou funkci to má pro rostlinu?</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+
+      <!-- 1.5 Volné -->
+      <div class="subsection">
+        <div class="subsection-title">1.5 Volná pozorování — vlastní nález</div>
+        <div class="subsection-desc">Vyhledej v terénu libovolný druh se zajímavými trichomy. Urči nebo odhadni druh.</div>
+        <div class="inline-field" style="margin-bottom:12px">
+          <label>Druh / příbuznost:</label>
+          <input class="inline-input" type="text" placeholder="název nebo příbuznost">
+        </div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:500px">
+            <colgroup><col style="width:45%"><col style="width:55%"></colgroup>
+            <tr class="split-cell-row">
+              <td>
+                <div class="draw-area-wrap">
+                  <div class="draw-area-label"><span>Náčrt (lupa 10× nebo 20×)</span></div>
+                  <div class="draw-canvas-wrap" id="wrap-f5"><canvas id="canvas-f5" height="200"></canvas></div>
+                  <div class="canvas-tools" id="tools-f5"></div>
+                </div>
+              </td>
+              <td>
+                <div style="padding:10px">
+                  <div class="inline-field"><label>Typ trichomů:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Hustota:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Umístění:</label><input class="inline-input" type="text"></div>
+                  <div class="inline-field"><label>Funkce:</label></div>
+                  <textarea class="answer-area" rows="3" placeholder="Pravděpodobná funkce…" style="margin-top:4px"></textarea>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Funkční srovnání</div>
+    </div>
+    <div class="section-body">
+      <div class="subsection">
+        <div class="subsection-title">2.1 Přehledná tabulka — druhy z pozorování</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table compact-table" style="min-width:600px">
+            <colgroup><col style="width:24%"><col style="width:20%"><col style="width:24%"><col style="width:32%"></colgroup>
+            <tr><th>Druh</th><th>Typ trichomů</th><th>Stanoviště</th><th>Funkce (hypotéza)</th></tr>
+            <tr><td class="cell-label" style="padding:6px 8px"><em>Verbascum</em> sp.</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td style="padding:6px 8px;font-size:11px;color:var(--stone);font-style:italic">kamenité svahy, okraje cest</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label" style="padding:6px 8px"><em>Thymus</em> sp.</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td style="padding:6px 8px;font-size:11px;color:var(--stone);font-style:italic">stepní trávník</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label" style="padding:6px 8px"><em>Galium aparine</em></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td style="padding:6px 8px;font-size:11px;color:var(--stone);font-style:italic">lužní lem</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label" style="padding:6px 8px"><em>Atriplex/Chenopodium</em></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td style="padding:6px 8px;font-size:11px;color:var(--stone);font-style:italic">ruderál</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none;font-style:italic" placeholder="vlastní nález 1"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none;font-style:italic" placeholder="vlastní nález 2"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="question-box">
+        <div class="question-text">2.2 Existuje vztah mezi typem stanoviště (sucho, stín, vlhko, ruderál) a převládajícím typem trichomů? Zformuluj hypotézu na základě dnešního pozorování.</div>
+        <textarea class="answer-area" rows="4" placeholder="Tvoje hypotéza…"></textarea>
+      </div>
+
+      <div class="question-box">
+        <div class="question-text">2.3 Vysvětli alespoň dvěma různými mechanismy, jak trichomy mohou snižovat transpiraci. Uveď konkrétní příklady z pozorování.</div>
+        <textarea class="answer-area" rows="4" placeholder="Mechanismus 1: …&#10;Mechanismus 2: …"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Ostny vs. trny — homologie nebo analogie?</div>
+    </div>
+    <div class="section-body">
+      <p class="subsection-desc">Najdi v terénu růži (<em>Rosa</em> sp.) a ostružiník (<em>Rubus</em> sp.). Porovnej jejich trny.</p>
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table" style="min-width:500px">
+          <colgroup><col style="width:32%"><col style="width:34%"><col style="width:34%"></colgroup>
+          <tr><th>Znak</th><th><em>Rosa</em></th><th><em>Rubus</em></th></tr>
+          <tr><td class="cell-label">Lze snadno odlomit bez poranění dřeva?</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="ano / ne"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="ano / ne"></td></tr>
+          <tr><td class="cell-label">Původ</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="epidermis / hlubší pletiva"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="epidermis / hlubší pletiva"></td></tr>
+          <tr><td class="cell-label">Trichomový charakter</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="ano / ne"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="ano / ne"></td></tr>
+          <tr><td class="cell-label">Funkce</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none"></td></tr>
+        </table>
+      </div>
+      <div class="question-box" style="margin-top:12px">
+        <div class="question-text">Jsou výrůstky <em>Rubus</em> pravé trichomy? Odůvodni svou odpověď.</div>
+        <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZÁVĚR + BONUS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">✎</div>
+      <div class="section-title">Závěrečná syntéza</div>
+    </div>
+    <div class="section-body">
+      <div class="question-box">
+        <div class="question-text">Trichomy jsou příkladem konvergentní evoluce. Vyber dva funkčně podobné trichomy ze dvou nepříbuzných druhů a popiš, jak dokládají konvergenci.</div>
+        <textarea class="answer-area" rows="5" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+      <div class="bonus-box">
+        <div class="bonus-label">⭐ Bonusová otázka</div>
+        <div class="bonus-question">Masožravé rostliny (rosnatka, tučnice) využívají lepivé žláznaté trichomy k lapání hmyzu. Jaké evoluční podmínky pravděpodobně vedly ke vzniku tohoto typu trichomů z „obyčejných" žláznatých trichomů?</div>
+        <textarea class="answer-area" rows="5" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 2: KOŘENOVÉ SYMBIÓZY
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-1">
+  <div class="sheet-header">
+    <div class="sheet-badge">Pracovní list 2</div>
+    <div class="sheet-title">Kořeny a kořenové symbiózy</div>
+    <div class="sheet-subtitle">Terénní kurz biologie · Jižní Morava · Pálava, Lednice-Valtice</div>
+    <div class="sheet-meta">
+      <div class="meta-field"><label>Jméno</label><input type="text" placeholder="Jméno a příjmení"></div>
+      <div class="meta-field"><label>Datum</label><input type="date"></div>
+      <div class="meta-field meta-full"><label>Lokalita</label><input type="text" placeholder="Lokalita"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" style="border:none;background:transparent;padding:16px 18px 0">
+      <div class="intro-box" style="margin:0;flex:1">
+        Kořeny nejsou jen orgány příjmu vody a minerálů. Jsou místem bohatých mezidruhových interakcí — od mutualismu po plný parazitismus.
+      </div>
+    </div>
+    <div class="section-body" style="padding:0 18px 0">
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table compact-table" style="min-width:600px;margin-bottom:16px">
+          <colgroup><col style="width:20%"><col style="width:20%"><col style="width:30%"><col style="width:30%"></colgroup>
+          <tr><th>Typ vztahu</th><th>Organismus</th><th>Získává od hostitele</th><th>Hostitel získává</th></tr>
+          <tr><td class="cell-label">Mutualismus</td><td><em>Rhizobium</em> + bob.</td><td>sacharidy z fotosyntézy</td><td>fixovaný dusík (NH₃)</td></tr>
+          <tr><td class="cell-label">Mutualismus</td><td>Ektomykorrhiza</td><td>sacharidy z fotosyntézy</td><td>voda, minerály (P, N)</td></tr>
+          <tr><td class="cell-label">Hemiparazitismus</td><td><em>Melampyrum</em> sp.</td><td>voda + minerály (xylém)</td><td>nic</td></tr>
+          <tr><td class="cell-label">Hemiparazitismus</td><td><em>Viscum album</em></td><td>voda + minerály (xylém)</td><td>nic</td></tr>
+          <tr><td class="cell-label">Holoparazitismus</td><td><em>Orobanche</em> sp.</td><td>voda + minerály + asimiláty</td><td>nic</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 1: Rhizobium -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Hlízkové bakterie (<em>Rhizobiales</em>)</div>
+    </div>
+    <div class="section-body">
+      <p class="subsection-desc">Vyhledej v terénu rostlinu z čeledi <em>Fabaceae</em> (vikev, jetel, kozinec, štírovník). Opatrně vykopej celou rostlinu i s kořenovým systémem.</p>
+
+      <div class="subsection">
+        <div class="subsection-title">1.1 Makroskopická pozorování</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Počet hlízek<span class="cell-hint">odhadni na hlavním kořeni</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Velikost hlízek<span class="cell-hint">v mm</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Tvar hlízek</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="kulatý / podlouhlý / nepravidelný"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Barva povrchu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="bílá / hnědá / narůžovělá"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Umístění na kořeni</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="boční / hlavní kořen"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">1.2 Průřez hlízkou</div>
+        <p class="subsection-desc">Přeřízni jednu hlízku nožem a porovnej barvu vnitřku s neaktivní (starou, zhnědlou) hlízkou.</p>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Barva aktivní hlízky<span class="cell-hint">růžová / červená = leghemoglobin</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Barva neaktivní hlízky<span class="cell-hint">zelená / hnědá</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Konzistence</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="pevná / mazlavá"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="question-box">
+        <div class="question-text">1.3 Proč má hlízka růžové zbarvení? Jaký protein za to zodpovídá a jakou funkci plní?</div>
+        <textarea class="answer-area" rows="4" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+      <div class="question-box">
+        <div class="question-text">Proč je fixace atmosferického dusíku evoluční výhodou právě ve stepi Pálavy?</div>
+        <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 2: Mykorrhiza -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Ektomykorrhiza</div>
+    </div>
+    <div class="section-body">
+      <p class="subsection-desc">V lužním lese nebo pod duby/borovicemi vyhledej kořeny a porovnej mykorrhizní a nemykorrhizní kořínky.</p>
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table" style="min-width:520px">
+          <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+          <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+          <tr><td class="cell-label">Barva mykorrhizních kořínků<span class="cell-hint">bílá / žlutá / hnědá / černá</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Tvar větvení</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="dichotomické vidličky?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Přítomnost kořenových vlásků</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ano / ne"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Povrch kořínků</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="hladký / opletený hyfami?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Druh hostitele</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="dub / borovice / jiný"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+        </table>
+      </div>
+      <div class="question-box" style="margin-top:12px">
+        <div class="question-text">Čím se liší ektomykorrhiza od arbuskulární mykorrhizy (AM) z hlediska anatomie napojení na hostitelský kořen? Proč AM nelze vidět pouhým okem?</div>
+        <textarea class="answer-area" rows="4" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 3: Melampyrum -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title"><em>Melampyrum</em> sp. (černýš) — kořenový hemiparazit</div>
+    </div>
+    <div class="section-body">
+      <div class="subsection">
+        <div class="subsection-title">3.1 Pozorování rostliny</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Druh černýše</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="M. nemorosum / M. arvense / M. pratense"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Přítomnost chlorofylu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ano / ne — je lodyha zelená?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Potenciální hostitel v okolí</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="tráva / jetel / jiná bylina do 20 cm"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Charakter kořenového systému</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="mělký / hluboký; větvený / jednoduchý"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title">3.2 Haustorium černýše</div>
+        <p class="subsection-desc">Proplachuj kořeny vodou a hledej místa kontaktu kořene černýše s kořenem hostitele. Haustorium = malý uzlík v místě kontaktu.</p>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Podařilo se haustorium najít?</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ano / ne"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Popis haustoria</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="velikost v mm, tvar, barva"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Oddělitelnost od hostitele</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="pevně přirostlé / jde oddělit"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title">3.3 Semena a myrmekochiorie</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Tvar a velikost semen</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="mm; oválná / hruškovitá"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Elaiosom viditelný?</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="světlý appendix na semeni — ano / ne"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Mravenci v okolí?</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ano / ne; manipulují se semeny?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="subsection">
+        <div class="subsection-title">3.4 Srovnání s jmelím</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:30%"><col style="width:35%"><col style="width:35%"></colgroup>
+            <tr><th>Znak</th><th><em>Melampyrum</em> sp.</th><th><em>Viscum album</em></th></tr>
+            <tr><td class="cell-label">Místo napojení</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="kořen / lodyha"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="kořen / lodyha"></td></tr>
+            <tr><td class="cell-label">Pletivo hostitele</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="xylém / floém"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="xylém / floém"></td></tr>
+            <tr><td class="cell-label">Chlorofyl</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="ano / ne"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none" placeholder="ano / ne"></td></tr>
+            <tr><td class="cell-label">Rozšíření semen</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none"></td></tr>
+            <tr><td class="cell-label">Roční / vytrvalá</td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none"></td><td><input type="text" style="width:100%;padding:8px 12px;border:none;background:transparent;font-family:inherit;font-size:13px;outline:none"></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="question-box">
+        <div class="question-text">3.5 Černýš je fakultativní hemiparazit, kokrhel (<em>Rhinanthus</em>) je obligátní. Jaký ekologický rozdíl z toho vyplývá pro šíření těchto rostlin do nových stanovišť?</div>
+        <textarea class="answer-area" rows="4" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 4–5 zkrácené -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">Jmelí bílé (<em>Viscum album</em>) — nadzemní hemiparazit</div>
+    </div>
+    <div class="section-body">
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table" style="min-width:520px">
+          <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+          <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+          <tr><td class="cell-label">Druh hostitele</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="topol / jabloň / jiný"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Stupeň napadení</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="1 keř / více keřů na stromě"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Viditelná změna větve</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ztluštění / zbarvení dřeva"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Barva listů jmelí</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="žlutozeleně i v zimě?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+        </table>
+      </div>
+      <div class="question-box" style="margin-top:12px">
+        <div class="question-text">Jmelí má chlorofyl a fotosyntetizuje — přesto je považováno za parazita. Vysvětli proč. Co přesně krade hostiteli a jakým mechanismem?</div>
+        <textarea class="answer-area" rows="4" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">Záraza (<em>Orobanche</em> sp.) — holoparazit</div>
+    </div>
+    <div class="section-body">
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table" style="min-width:520px">
+          <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+          <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+          <tr><td class="cell-label">Barva lodyhy</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="žlutá / hnědá / karmínová"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Přítomnost chlorofylu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ano / ne — jak poznáš?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Charakter listů</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="redukované šupiny / chybí úplně"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Potenciální hostitel v okolí</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="druh rostliny do 30 cm"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+        </table>
+      </div>
+
+      <div class="subsection" style="margin-top:16px">
+        <div class="subsection-title">5.3 Srovnání celého spektra</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table compact-table" style="min-width:550px">
+            <colgroup><col style="width:22%"><col style="width:26%"><col style="width:26%"><col style="width:26%"></colgroup>
+            <tr><th>Znak</th><th><em>Melampyrum</em></th><th><em>Viscum album</em></th><th><em>Orobanche</em></th></tr>
+            <tr><td class="cell-label">Chlorofyl</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label">Napojení na xylém</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label">Napojení na floém</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label">Místo parazitace</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label">Schopnost fotosyntézy</td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-num">✎</div><div class="section-title">Závěrečná syntéza</div></div>
+    <div class="section-body">
+      <div class="question-box">
+        <div class="question-text">Na základě dnešního pozorování seřaď sledované organismy na škálu od plného mutualismu po plný parazitismus a stručně odůvodni jejich umístění.</div>
+        <textarea class="answer-area" rows="6" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+      <div class="bonus-box">
+        <div class="bonus-label">⭐ Bonusová otázka</div>
+        <div class="bonus-question">Jak si myslíš, že mohla evolučně vzniknout záraza z předka, který byl fotosyntetizující rostlinou? Jaké meziforomy by mohly existovat?</div>
+        <textarea class="answer-area" rows="5" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 3: ŠÍŘENÍ DIASPOR
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-2">
+  <div class="sheet-header">
+    <div class="sheet-badge">Pracovní list 3</div>
+    <div class="sheet-title">Šíření diaspor</div>
+    <div class="sheet-subtitle">Terénní kurz biologie · Jižní Morava · Lednice · Pálava</div>
+    <div class="sheet-meta">
+      <div class="meta-field"><label>Jméno</label><input type="text" placeholder="Jméno a příjmení"></div>
+      <div class="meta-field"><label>Datum</label><input type="date"></div>
+      <div class="meta-field meta-full"><label>Lokalita</label><input type="text" placeholder="Lokalita"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-body" style="padding:0">
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table compact-table" style="min-width:620px">
+          <colgroup><col style="width:18%"><col style="width:22%"><col style="width:30%"><col style="width:30%"></colgroup>
+          <tr><th>Typ šíření</th><th>Vektor / mechanismus</th><th>Typické adaptace</th><th>Příklady na JM</th></tr>
+          <tr><td class="cell-label">Anemochorie</td><td>vítr</td><td>křídla, chmýří, malá hmotnost</td><td><em>Populus</em>, <em>Acer</em>, <em>Taraxacum</em></td></tr>
+          <tr><td class="cell-label">Epizoochorie</td><td>přichycení na srst/peří/oděv</td><td>háčky, ostny, lepivý povrch</td><td><em>Galium</em>, <em>Arctium</em></td></tr>
+          <tr><td class="cell-label">Endozoochorie</td><td>přes trávicí trakt živočicha</td><td>dužnaté obaly, barevné atraktanty</td><td><em>Sambucus</em>, <em>Rosa</em>, <em>Prunus</em></td></tr>
+          <tr><td class="cell-label">Myrmekochorie</td><td>mravenci (elaiosom)</td><td>tukové tělísko na semeni</td><td><em>Viola</em>, <em>Chelidonium</em>, černýš</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 1: Stromy -->
+  <div class="section">
+    <div class="section-header"><div class="section-num">1</div><div class="section-title">Stromy — anemochorní diaspory</div></div>
+    <div class="section-body">
+      <!-- Populus -->
+      <div class="subsection">
+        <div class="subsection-title">1.1 <em class="italic">Populus</em> sp. (topol) — chmýří</div>
+        <div class="subsection-desc">Na jaře hledej opadlé tobolky nebo přímo létající chmýří topolu.</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Charakter chmýří<span class="cell-hint">délka vláken v mm, hustota</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Semeno<span class="cell-hint">velikost, tvar, barva</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Poměr semeno : chmýří</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Chování ve vzduchu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="vznáší se / klesá rychle / rotuje"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt diaspory — <em>Populus</em></div>
+            <div class="draw-canvas-wrap" id="wrap-p1"><canvas id="canvas-p1" height="180"></canvas></div>
+            <div class="canvas-tools" id="tools-p1"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Popis morfologie</div>
+            <div class="inline-field"><label>Typ diaspory:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Adaptace:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Šíření (km?):</label><input class="inline-input" type="text" placeholder="odhadovaná vzdálenost"></div>
+            <div style="margin-top:8px;font-size:12px;font-weight:700;color:var(--stone);margin-bottom:4px">Typ šíření:</div>
+            <div class="checkbox-group" id="chk-p1">
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Anemochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Epizoochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Endozoochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Myrmekochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Autochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Hydrochorie</label>
+            </div>
+          </div>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Chmýří topolu tvoří vlákna z pokožky semenného obalu — nejde tedy o papus jako u složnokvětých. Jaký je funkční rozdíl mezi těmito dvěma typy chmýří? Mají stejnou aerodynamiku?</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+
+      <!-- Acer -->
+      <div class="subsection">
+        <div class="subsection-title">1.2 <em class="italic">Acer campestre</em> (babyka) — křídlatá nažka (samara)</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Délka křídla (samary)<span class="cell-hint">v mm</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Úhel mezi křídly páru<span class="cell-hint">stupně — přibližně</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Umístění semene vůči křídlu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="u báze / uprostřed / na konci"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Chování při pádu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="rotuje / plachtí / padá rovně"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt — <em>Acer campestre</em></div>
+            <div class="draw-canvas-wrap" id="wrap-a2"><canvas id="canvas-a2" height="180"></canvas></div>
+            <div class="canvas-tools" id="tools-a2"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="inline-field"><label>Typ diaspory:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Adaptace:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Šíření (km?):</label><input class="inline-input" type="text"></div>
+            <div class="checkbox-group">
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Anemochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Epizoochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Endozoochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Myrmekochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Autochorie</label>
+              <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Hydrochorie</label>
+            </div>
+          </div>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Nažka babyk rotuje při pádu — jde o pasivní autorotaci způsobenou aerodynamickým profilem křídla. Jakou výhodu tato rotace přináší oproti přímému pádu? Naznač fyzikální princip.</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">1.3 Srovnání dvou anemochorních strategií</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table compact-table" style="min-width:500px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Znak</th><th><em>Populus</em> sp.</th><th><em>Acer campestre</em></th></tr>
+            <tr><td class="cell-label">Typ struktury pro let</td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label">Princip letu</td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none" placeholder="plachtění / vznášení / rotace"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label">Počet semen / diasporu</td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label">Fenologie</td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none" placeholder="kdy se šíří?"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+            <tr><td class="cell-label">Odhadovaná vzdálenost šíření</td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 2: Byliny -->
+  <div class="section">
+    <div class="section-header"><div class="section-num">2</div><div class="section-title">Byliny — různé typy šíření</div></div>
+    <div class="section-body">
+      <!-- Anemochorie byliny -->
+      <div class="subsection">
+        <div class="subsection-title">2.1 Anemochorie — byliny s papusem nebo křídly</div>
+        <div class="subsection-desc">Na Pálavě: pupava bezlodyžná, pcháč, smetánka, plamének (ocásky plodů).</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Druh (nebo příbuznost)</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Typ anemochorní struktury</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="papus / křídlo / ocásek / jiné"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Délka papusu nebo křídla<span class="cell-hint">v mm</span></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Stavba papusu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="jednoduché / peřité / šupinaté chlupy"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt — anemochorní bylina</div>
+            <div class="draw-canvas-wrap" id="wrap-b21"><canvas id="canvas-b21" height="160"></canvas></div>
+            <div class="canvas-tools" id="tools-b21"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="inline-field"><label>Typ diaspory:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Adaptace:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Vzdálenost:</label><input class="inline-input" type="text"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Epizoochorie -->
+      <div class="subsection">
+        <div class="subsection-title">2.2 Epizoochorie — háčkovité a lepivé diaspory</div>
+        <div class="subsection-desc">Přejdi lemem lužního lesa. Zkontroluj oděv po průchodu. Druhy: <em>Galium aparine</em>, <em>Arctium lappa</em>, <em>Agrimonia eupatoria</em>.</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Druh</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Typ uchycovacích struktur</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="háčky / ostny / lepivý povrch / zurky"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Pevnost uchycení</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="snadno odpadá / pevně drží"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Potenciální přenašeč</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="srst savce / peří ptáka / oděv"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt — epizoochorní diaspora</div>
+            <div class="draw-canvas-wrap" id="wrap-b22"><canvas id="canvas-b22" height="160"></canvas></div>
+            <div class="canvas-tools" id="tools-b22"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="inline-field"><label>Typ diaspory:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Adaptace:</label><input class="inline-input" type="text"></div>
+          </div>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Epizoochorie vyžaduje přímý kontakt diaspory s vektorem. Jaké stanoviště a chování rostliny maximalizuje pravděpodobnost tohoto kontaktu?</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+
+      <!-- Endozoochorie -->
+      <div class="subsection">
+        <div class="subsection-title">2.3 Endozoochorie — dužnaté plody</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Druh</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Typ plodu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="peckovice / bobule / šípek / jiný"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Barva a charakter obalu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="dužnatý / šťavnatý / suchý?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Potenciální živočišný vektor</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ptáci / savci / obojí"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt — endozoochorní plod</div>
+            <div class="draw-canvas-wrap" id="wrap-b23"><canvas id="canvas-b23" height="160"></canvas></div>
+            <div class="canvas-tools" id="tools-b23"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="inline-field"><label>Typ diaspory:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Adaptace:</label><input class="inline-input" type="text"></div>
+          </div>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Semena endozoochorních rostlin musejí přežít průchod trávicím traktem. Jaké vlastnosti osemení to umožňují? A jaká je výhoda oproti anemochorii?</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+
+      <!-- Myrmekochorie -->
+      <div class="subsection">
+        <div class="subsection-title">2.4 Myrmekochorie — semena s elaiosomem</div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Druh s elaiosomem</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="Melampyrum / Viola / Corydalis / jiný"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Poloha elaiozomu na semeni</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="hilum / micropyle / jiná"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Barva a konzistence elaiozomu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="bílý / žlutý / tuhý / mazlavý"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Přítomnost mravenců</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ano / ne"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt — myrmekochorní semeno</div>
+            <div class="draw-canvas-wrap" id="wrap-b24"><canvas id="canvas-b24" height="160"></canvas></div>
+            <div class="canvas-tools" id="tools-b24"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="inline-field"><label>Typ diaspory:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Adaptace:</label><input class="inline-input" type="text"></div>
+          </div>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Mravenec odnese semeno do mraveniště kvůli elaiozomu. Samotné semeno vyhodí na hromadu odpadu. Jaké podmínky na hromadě odpadu jsou pro klíčení výhodné?</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 3 + ZÁVĚR -->
+  <div class="section">
+    <div class="section-header"><div class="section-num">3</div><div class="section-title">Terénní průzkum — vlastní sběr (min. 10 druhů)</div></div>
+    <div class="section-body">
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table compact-table" style="min-width:620px">
+          <colgroup><col style="width:20%"><col style="width:16%"><col style="width:22%"><col style="width:18%"><col style="width:24%"></colgroup>
+          <tr><th>Druh / příbuznost</th><th>Typ diaspory</th><th>Adaptační znak</th><th>Typ šíření</th><th>Lokalita</th></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-num">✎</div><div class="section-title">Závěrečná syntéza</div></div>
+    <div class="section-body">
+      <div class="question-box">
+        <div class="question-text">Které z dnes pozorovaných adaptací diaspor považuješ za nejelegantnější z hlediska evoluce a proč? Svou volbu zdůvodni ekologicky i mechanisticky.</div>
+        <textarea class="answer-area" rows="5" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+      <div class="bonus-box">
+        <div class="bonus-label">⭐ Bonusová otázka</div>
+        <div class="bonus-question">Topol a vrba jsou příbuzné dřeviny (obě čeleď Salicaceae), obě šíří diaspory chmýřím. Přesto mají různou fenologii šíření. Jaký selekční tlak mohl vést k tomuto rozdílu?</div>
+        <textarea class="answer-area" rows="4" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 4: OPYLENÍ
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-3">
+  <div class="sheet-header">
+    <div class="sheet-badge">Pracovní list 4</div>
+    <div class="sheet-title">Přenos pylu a opylení</div>
+    <div class="sheet-subtitle">Terénní kurz biologie · Jižní Morava · Pálava · Lednice</div>
+    <div class="sheet-meta">
+      <div class="meta-field"><label>Jméno</label><input type="text" placeholder="Jméno a příjmení"></div>
+      <div class="meta-field"><label>Datum</label><input type="date"></div>
+      <div class="meta-field meta-full"><label>Lokalita</label><input type="text" placeholder="Lokalita"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-body" style="padding:0">
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table compact-table" style="min-width:600px">
+          <colgroup><col style="width:20%"><col style="width:15%"><col style="width:35%"><col style="width:30%"></colgroup>
+          <tr><th>Typ opylení</th><th>Vektor</th><th>Typické znaky květu</th><th>Příklady na JM</th></tr>
+          <tr><td class="cell-label">Entomogamie — včely</td><td>včely, čmeláci</td><td>modrofialová, nektarová vodítka UV, symetrie</td><td><em>Salvia pratensis</em>, <em>Echium</em></td></tr>
+          <tr><td class="cell-label">Entomogamie — motýli</td><td>motýli</td><td>červená/růžová, dlouhý sosák, noční vůně</td><td><em>Dianthus</em>, <em>Silene</em></td></tr>
+          <tr><td class="cell-label">Entomogamie — mouchy</td><td>pestřenky, bzučivky</td><td>bílá/žlutá/hnědá, páchnoucí nebo nenápadná</td><td>miříkovité, pryskyřník</td></tr>
+          <tr><td class="cell-label">Anemogamie</td><td>vítr</td><td>malé nevýrazné květy, velké prašníky, volný pyl</td><td>trávy, duby, topoly</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 1 -->
+  <div class="section">
+    <div class="section-header"><div class="section-num">1</div><div class="section-title">Morfologie květu a syndrom opylovače</div></div>
+    <div class="section-body">
+      <p class="subsection-desc">Vyberte 3 různé kvetoucí rostliny z různých biotopů. Pro každou vyplňte pozorovací tabulku a narýsujte náčrt.</p>
+
+      <!-- Rostlina 1 -->
+      <div class="subsection">
+        <div class="subsection-title">1.1 Rostlina č. 1</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <div class="inline-field" style="flex:2;min-width:180px"><label>Druh / příbuznost:</label><input class="inline-input" type="text"></div>
+          <div class="inline-field" style="flex:1;min-width:120px"><label>Biotop:</label><input class="inline-input" type="text"></div>
+        </div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Symetrie květu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="radiální (actinomorfní) / bilaterální (zygomorfní)"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Barva okvětí</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="přesně — i UV vodítka pokud vidíš"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Počet okvětních lístků</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="korunních i kališních"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Vůně</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ano / ne / intenzivní / sladká / páchnoucí"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Nektarium</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="viditelné / skryté / chybí"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Charakter tyčinek a prašníků</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="volné / srostlé / počet; pyl sypký nebo lepivý?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Blizna</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="tvar, poloha vůči prašníkům (dichogamie?)"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Hloubka přístupu k nektaru</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="mm — jak hluboký je květ?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt — celý květ + detail prašník/blizna</div>
+            <div class="draw-canvas-wrap" id="wrap-o1"><canvas id="canvas-o1" height="200"></canvas></div>
+            <div class="canvas-tools" id="tools-o1"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="inline-field" style="flex-wrap:wrap">
+              <label>Symetrie:</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Radiální</label>
+                <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Bilaterální</label>
+              </div>
+            </div>
+            <div class="inline-field"><label>Barva:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Počet lístků:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field">
+              <label>Vůně:</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Ano</label>
+                <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Ne</label>
+                <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Intenzivní</label>
+              </div>
+            </div>
+            <div class="inline-field"><label>Pyl:</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Volný (sypký)</label>
+                <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Lepivý</label>
+              </div>
+            </div>
+            <div class="inline-field"><label>Opylovač (odhadnutý):</label><input class="inline-input" type="text"></div>
+          </div>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Na základě morfologie odhadni syndrom opylovače a zdůvodni:</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje zdůvodnění…"></textarea>
+        </div>
+      </div>
+
+      <!-- Rostlina 2 -->
+      <div class="subsection">
+        <div class="subsection-title">1.2 Rostlina č. 2</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <div class="inline-field" style="flex:2;min-width:180px"><label>Druh / příbuznost:</label><input class="inline-input" type="text"></div>
+          <div class="inline-field" style="flex:1;min-width:120px"><label>Biotop:</label><input class="inline-input" type="text"></div>
+        </div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Symetrie květu</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="radiální / bilaterální"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Barva okvětí</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Počet okvětních lístků</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Vůně</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Nektarium</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="viditelné / skryté / chybí"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Charakter tyčinek a prašníků</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="pyl sypký nebo lepivý?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Blizna</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Hloubka přístupu k nektaru</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="mm"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt — Rostlina č. 2</div>
+            <div class="draw-canvas-wrap" id="wrap-o2"><canvas id="canvas-o2" height="200"></canvas></div>
+            <div class="canvas-tools" id="tools-o2"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="inline-field"><label>Barva:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Počet lístků:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Opylovač:</label><input class="inline-input" type="text"></div>
+          </div>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Odhadni syndrom opylovače a zdůvodni:</div>
+          <textarea class="answer-area" rows="3" placeholder="Tvoje zdůvodnění…"></textarea>
+        </div>
+      </div>
+
+      <!-- Rostlina 3: anemogamní -->
+      <div class="subsection">
+        <div class="subsection-title">1.3 Rostlina č. 3 — anemogamní druh (tráva nebo strom)</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <div class="inline-field" style="flex:2;min-width:180px"><label>Druh / příbuznost:</label><input class="inline-input" type="text"></div>
+          <div class="inline-field" style="flex:1;min-width:120px"><label>Biotop:</label><input class="inline-input" type="text"></div>
+        </div>
+        <div class="obs-table-wrap">
+          <table class="data-table obs-table" style="min-width:520px">
+            <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+            <tr><th>Pozorovaný znak</th><th>Pozorování / popis</th><th>Interpretace / funkce</th></tr>
+            <tr><td class="cell-label">Barva okvětí / plevy</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="výrazná / nevýrazná / chybí okvětí"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Vůně</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="ano / ne"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Nektarium</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="přítomno / chybí"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Prašníky</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="velikost, poloha — vyčnívají z květu?"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Blizna</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="péřovitá / lepkavá / jiná"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+            <tr><td class="cell-label">Charakter pylu lupou</td><td><textarea class="answer-area" rows="2" style="min-height:50px" placeholder="sypký / lepivý / množství"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <div style="font-size:12px;font-weight:700;color:var(--stone);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Náčrt — anemogamní květ (prašník + blizna)</div>
+            <div class="draw-canvas-wrap" id="wrap-o3"><canvas id="canvas-o3" height="200"></canvas></div>
+            <div class="canvas-tools" id="tools-o3"></div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div class="inline-field"><label>Barva:</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Pyl: sypký / lepivý</label><input class="inline-input" type="text"></div>
+            <div class="inline-field"><label>Blizna — tvar:</label><input class="inline-input" type="text"></div>
+          </div>
+        </div>
+        <div class="question-box" style="margin-top:12px">
+          <div class="question-text">Porovnej anemogamní květ s entomogamními — jaké znaky jsou zásadně odlišné a proč?</div>
+          <textarea class="answer-area" rows="4" placeholder="Tvoje odpověď…"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁST 2: Pozorování opylovačů -->
+  <div class="section">
+    <div class="section-header"><div class="section-num">2</div><div class="section-title">Pozorování opylovačů u vybrané rostliny (15 min)</div></div>
+    <div class="section-body">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="inline-field" style="flex:2"><label>Pozorovaná rostlina:</label><input class="inline-input" type="text"></div>
+        <div class="inline-field" style="flex:1"><label>Lokalita:</label><input class="inline-input" type="text"></div>
+        <div class="inline-field" style="flex:1"><label>Čas od:</label><input class="inline-input" type="time"></div>
+        <div class="inline-field" style="flex:1"><label>do:</label><input class="inline-input" type="time"></div>
+        <div class="inline-field" style="flex:1"><label>Teplota (°C):</label><input class="inline-input" type="number" placeholder="°C"></div>
+        <div class="inline-field" style="flex:1"><label>Počasí:</label><input class="inline-input" type="text"></div>
+        <div class="inline-field" style="flex:2">
+          <label>Větrnost:</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Slabý</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Střední</label>
+            <label class="checkbox-item" onclick="toggleCheck(this)"><input type="checkbox">Silný</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table compact-table" style="min-width:620px">
+          <colgroup><col style="width:10%"><col style="width:22%"><col style="width:14%"><col style="width:24%"><col style="width:30%"></colgroup>
+          <tr><th>Čas</th><th>Návštěvník (druh / skupina)</th><th>Délka návštěvy (s)</th><th>Část květu navštívená</th><th>Pyl na těle? Pravděpodobný opylovač?</th></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:6px 8px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+        </table>
+      </div>
+
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+        <div class="inline-field"><label>Celkový počet návštěv / 15 min:</label><input class="inline-input" type="number" style="min-width:60px;max-width:80px"></div>
+        <div class="inline-field"><label>Počet různých skupin opylovačů:</label><input class="inline-input" type="number" style="min-width:60px;max-width:80px"></div>
+      </div>
+
+      <div class="question-box" style="margin-top:12px">
+        <div class="question-text">Který opylovač byl nejčastější? Odpovídá to morfologii květu (syndromu opylovače) z části 1?</div>
+        <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+      <div class="question-box">
+        <div class="question-text">Zaznamenal/a jsi i návštěvníky, kteří kradli nektar bez kontaktu s prašníky nebo bliznou? Jak se jejich chování lišilo od skutečných opylovačů?</div>
+        <textarea class="answer-area" rows="3" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ČÁSTI 3 + 4 -->
+  <div class="section">
+    <div class="section-header"><div class="section-num">3</div><div class="section-title">Pylové syndromy — srovnání</div></div>
+    <div class="section-body">
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table" style="min-width:500px">
+          <colgroup><col style="width:28%"><col style="width:36%"><col style="width:36%"></colgroup>
+          <tr><th>Znak pylu / prašníku</th><th>Entomogamní druh</th><th>Anemogamní druh</th></tr>
+          <tr><td class="cell-label">Barva pylu</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Lepivost pylu</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Množství pylu na prašník</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Velikost prašníků</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Poloha prašníků v květu</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+          <tr><td class="cell-label">Charakter blizny</td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td><td><textarea class="answer-area" rows="2" style="min-height:50px"></textarea></td></tr>
+        </table>
+      </div>
+      <div class="question-box" style="margin-top:12px">
+        <div class="question-text">Anemogamní rostliny produkují řádově více pylu než entomogamní. Proč? Uvažuj z hlediska pravděpodobnosti úspěšného opylení u každé strategie.</div>
+        <textarea class="answer-area" rows="4" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-num">4</div><div class="section-title">Opylovací síť — skupinová data</div></div>
+    <div class="section-body">
+      <p class="subsection-desc">Zaznamenej data od ostatních spolužáků — budete sestavovat bipartitní síť rostlina–opylovač.</p>
+      <div class="obs-table-wrap">
+        <table class="data-table obs-table compact-table" style="min-width:540px">
+          <colgroup><col style="width:35%"><col style="width:40%"><col style="width:25%"></colgroup>
+          <tr><th>Rostlina (druh / příbuznost)</th><th>Opylovači (skupiny nebo druhy)</th><th>Počet návštěv / 15 min</th></tr>
+          <tr><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="number" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="number" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="number" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="number" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="number" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+          <tr><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="text" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td><td><input type="number" style="width:100%;padding:7px 10px;border:none;background:transparent;font-family:inherit;font-size:12px;outline:none"></td></tr>
+        </table>
+      </div>
+      <div class="question-box" style="margin-top:12px">
+        <div class="question-text">Existují opylovači generalisté (navštěvují více druhů)? Jsou některé rostliny navštěvovány jen jedním typem opylovače (specialisté)?</div>
+        <textarea class="answer-area" rows="4" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-num">✎</div><div class="section-title">Závěrečná syntéza</div></div>
+    <div class="section-body">
+      <div class="question-box">
+        <div class="question-text">Morfologie květu a syndrom opylovače jsou výsledkem koevoluce. Vyber jeden konkrétní příklad z dnešního pozorování a popiš, jak přesně morfologické znaky květu zvyšují pravděpodobnost úspěšného přenosu pylu konkrétním opylovačem.</div>
+        <textarea class="answer-area" rows="6" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+      <div class="bonus-box">
+        <div class="bonus-label">⭐ Bonusová otázka</div>
+        <div class="bonus-question"><em>Ophrys</em> (tořič) na Pálavě opyluje samec včely nebo osy — květ napodobuje samici opylovače vůní, tvarem i texturou. Opylovač se pokouší o páření s květem (pseudokopulace) a přitom přenese pyl. Rostlina neposkytuje ani nektar ani pyl jako odměnu. Jak tuto strategii hodnotíš z evolučního hlediska — jakou výhodu a nevýhodu má oproti klasické entomogamii s odměnou?</div>
+        <textarea class="answer-area" rows="5" placeholder="Tvoje odpověď…"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIONS BAR -->
+<div class="actions-bar">
+  <button class="action-btn btn-primary" onclick="saveAll()">💾 Uložit odpovědi</button>
+  <button class="action-btn btn-secondary" onclick="clearPage()">🗑 Smazat stránku</button>
+</div>
+
+<script>
+// =============================================
+//  NAVIGATION
+// =============================================
+function showPage(idx, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + idx).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// =============================================
+//  CHECKBOXES
+// =============================================
+function toggleCheck(label) {
+  label.classList.toggle('checked');
+}
+
+// =============================================
+//  CANVAS DRAWING
+// =============================================
+const canvases = {};
+
+function initCanvas(id) {
+  const canvas = document.getElementById('canvas-' + id);
+  if (!canvas) return;
+  const wrap = document.getElementById('wrap-' + id);
+  const toolsDiv = document.getElementById('tools-' + id);
+  
+  // Size canvas to container
+  function resizeCanvas() {
+    const w = wrap.clientWidth;
+    const h = parseInt(canvas.getAttribute('height')) || 200;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    // White background
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, w, h);
+    if (state.savedData) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, w, h);
+      img.src = state.savedData;
+    }
+  }
+
+  const state = {
+    drawing: false, tool: 'pen', color: '#1a1a14', size: 2,
+    lastX: 0, lastY: 0, savedData: null
+  };
+
+  // Build toolbar
+  const colors = ['#1a1a14','#2d5016','#c87941','#c0392b','#2980b9','#888'];
+  const colorDots = colors.map(c => {
+    const d = document.createElement('span');
+    d.className = 'color-dot' + (c === state.color ? ' active' : '');
+    d.style.background = c;
+    d.title = c;
+    d.onclick = () => {
+      state.color = c; state.tool = 'pen';
+      colorDots.forEach(dd => dd.classList.remove('active'));
+      d.classList.add('active');
+      penBtn.classList.add('active'); eraserBtn.classList.remove('active');
+    };
+    return d;
+  });
+
+  const penBtn = document.createElement('button');
+  penBtn.className = 'tool-btn active'; penBtn.textContent = '✏️ Tužka';
+  penBtn.onclick = () => { state.tool = 'pen'; penBtn.classList.add('active'); eraserBtn.classList.remove('active'); };
+
+  const eraserBtn = document.createElement('button');
+  eraserBtn.className = 'tool-btn'; eraserBtn.textContent = '🧹 Guma';
+  eraserBtn.onclick = () => { state.tool = 'eraser'; eraserBtn.classList.add('active'); penBtn.classList.remove('active'); };
+
+  const sizes = [2, 4, 8];
+  const sizeBtns = sizes.map(s => {
+    const b = document.createElement('div');
+    b.className = 'size-dot' + (s === 2 ? ' active' : '');
+    b.style.width = b.style.height = (s * 2 + 6) + 'px';
+    b.style.border = s === state.size ? '2px solid var(--green-mid)' : '2px solid transparent';
+    b.title = s + 'px';
+    b.onclick = () => {
+      state.size = s;
+      sizeBtns.forEach(bb => bb.style.border = '2px solid transparent');
+      b.style.border = '2px solid var(--green-mid)';
+    };
+    return b;
+  });
+
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'tool-btn clear-btn'; clearBtn.textContent = '🗑 Smazat';
+  clearBtn.onclick = () => {
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width / (window.devicePixelRatio||1), canvas.height / (window.devicePixelRatio||1));
+    state.savedData = null;
+  };
+
+  // Add to toolbar
+  [penBtn, eraserBtn, ...sizeBtns, ...colorDots, clearBtn].forEach(el => toolsDiv.appendChild(el));
+
+  canvases[id] = { canvas, state, resizeCanvas };
+  resizeCanvas();
+
+  // Drawing functions
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = 1; // already scaled via ctx.scale
+    let x, y;
+    if (e.touches && e.touches.length > 0) {
+      const touch = e.touches[0];
+      x = (touch.clientX - rect.left);
+      y = (touch.clientY - rect.top);
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+    return { x, y };
+  }
+
+  function startDraw(e) {
+    if (e.touches && e.touches.length > 1) return; // pinch = scroll
+    e.preventDefault();
+    state.drawing = true;
+    const pos = getPos(e);
+    state.lastX = pos.x; state.lastY = pos.y;
+    const ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, (state.tool === 'eraser' ? state.size * 3 : state.size) / 2, 0, Math.PI * 2);
+    ctx.fillStyle = state.tool === 'eraser' ? '#fff' : state.color;
+    ctx.fill();
+  }
+
+  function draw(e) {
+    if (!state.drawing) return;
+    if (e.touches && e.touches.length > 1) { state.drawing = false; return; }
+    e.preventDefault();
+    const pos = getPos(e);
+    const ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(state.lastX, state.lastY);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.strokeStyle = state.tool === 'eraser' ? '#fff' : state.color;
+    ctx.lineWidth = state.tool === 'eraser' ? state.size * 6 : state.size;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    state.lastX = pos.x; state.lastY = pos.y;
+  }
+
+  function stopDraw() {
+    state.drawing = false;
+    state.savedData = canvas.toDataURL();
+  }
+
+  // Pointer events (stylus support)
+  canvas.addEventListener('pointerdown', startDraw, { passive: false });
+  canvas.addEventListener('pointermove', draw, { passive: false });
+  canvas.addEventListener('pointerup', stopDraw);
+  canvas.addEventListener('pointerleave', stopDraw);
+  canvas.addEventListener('pointercancel', stopDraw);
+  
+  // Touch fallback
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove', draw, { passive: false });
+  canvas.addEventListener('touchend', stopDraw);
+}
+
+// =============================================
+//  AUTO-RESIZE TEXTAREAS
+// =============================================
+document.addEventListener('input', function(e) {
+  if (e.target.tagName === 'TEXTAREA') {
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.max(e.target.scrollHeight, 50) + 'px';
+  }
+});
+
+// =============================================
+//  SAVE / LOAD (localStorage)
+// =============================================
+function saveAll() {
+  const data = {};
+  // Text inputs
+  document.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea').forEach((el, i) => {
+    if (el.id) data['id_' + el.id] = el.value;
+    else data['idx_' + i] = el.value;
+  });
+  // Checkboxes
+  document.querySelectorAll('.checkbox-item').forEach((el, i) => {
+    data['chk_' + i] = el.classList.contains('checked');
+  });
+  // Canvases
+  Object.keys(canvases).forEach(id => {
+    const c = canvases[id];
+    if (c.state.savedData) data['canvas_' + id] = c.state.savedData;
+  });
+
+  try {
+    localStorage.setItem('biologie_pracovni_listy', JSON.stringify(data));
+    showToast('✓ Uloženo');
+  } catch(e) {
+    showToast('⚠ Nepodařilo se uložit (příliš velká data)');
+  }
+}
+
+function loadAll() {
+  try {
+    const raw = localStorage.getItem('biologie_pracovni_listy');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    document.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea').forEach((el, i) => {
+      const key = el.id ? 'id_' + el.id : 'idx_' + i;
+      if (data[key] !== undefined) {
+        el.value = data[key];
+        if (el.tagName === 'TEXTAREA') { el.style.height = 'auto'; el.style.height = Math.max(el.scrollHeight, 50) + 'px'; }
+      }
+    });
+    document.querySelectorAll('.checkbox-item').forEach((el, i) => {
+      if (data['chk_' + i]) el.classList.add('checked');
+      else el.classList.remove('checked');
+    });
+    Object.keys(canvases).forEach(id => {
+      if (data['canvas_' + id]) {
+        const c = canvases[id];
+        c.state.savedData = data['canvas_' + id];
+        c.resizeCanvas();
+      }
+    });
+  } catch(e) { console.warn('Load failed:', e); }
+}
+
+function clearPage() {
+  if (!confirm('Smazat všechny odpovědi na této stránce?')) return;
+  const activePage = document.querySelector('.page.active');
+  activePage.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea').forEach(el => { el.value = ''; el.style.height = ''; });
+  activePage.querySelectorAll('.checkbox-item').forEach(el => el.classList.remove('checked'));
+  activePage.querySelectorAll('canvas').forEach(canvas => {
+    const id = canvas.id.replace('canvas-', '');
+    if (canvases[id]) {
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      canvases[id].state.savedData = null;
+    }
+  });
+  showToast('🗑 Stránka smazána');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('saveToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// =============================================
+//  AUTO-SAVE every 30 seconds
+// =============================================
+setInterval(saveAll, 30000);
+
+// =============================================
+//  INIT
+// =============================================
+window.addEventListener('load', () => {
+  // Init all canvases
+  const ids = ['v1','t2','g3','a4','f5','p1','a2','b21','b22','b23','b24','o1','o2','o3'];
+  ids.forEach(id => initCanvas(id));
+  // Load saved data
+  loadAll();
+});
+
+window.addEventListener('resize', () => {
+  Object.keys(canvases).forEach(id => canvases[id].resizeCanvas());
+});
+</script>
+</body>
+</html>
